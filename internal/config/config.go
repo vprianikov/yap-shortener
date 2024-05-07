@@ -10,8 +10,7 @@ type config struct {
 }
 
 func New() (models.Config, error) {
-	var m models.Config
-	m = &config{
+	var m models.Config = &config{
 		host: `localhost`,
 		port: `8080`,
 	}
