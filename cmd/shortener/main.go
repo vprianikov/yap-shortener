@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/vprianikov/yap-shortener/internal/config"
+	"github.com/vprianikov/yap-shortener/internal/handlers"
+	"github.com/vprianikov/yap-shortener/internal/server"
 	"github.com/vprianikov/yap-shortener/internal/storage"
 )
 
@@ -13,24 +13,20 @@ func main() {
 		panic(errC)
 	}
 
-	fmt.Printf("Server must be started on http://%s:%s\n", c.Host(), c.Port())
-
 	s, errS := storage.New()
 	if errS != nil {
 		panic(errS)
 	}
 
-	key, errK := s.Set(`https://ya.ru`)
-	if errK != nil {
-		fmt.Println(errK)
-	} else {
-		fmt.Println(key)
+	l, errL := server.New(&handlers.Env{
+		Config:  c,
+		Storage: s,
+	})
+	if errL != nil {
+		panic(errL)
 	}
 
-	url, errU := s.Get(key)
-	if errU != nil {
-		fmt.Println(errU)
-	} else {
-		fmt.Println(url)
+	if err := l.ListenAndServe(); err != nil {
+		panic(err)
 	}
 }
