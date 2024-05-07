@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/vprianikov/yap-shortener/internal/config"
 	"github.com/vprianikov/yap-shortener/internal/handlers"
 	"github.com/vprianikov/yap-shortener/internal/server"
@@ -8,7 +10,7 @@ import (
 )
 
 func main() {
-	c, errC := config.New()
+	c, errC := config.New(os.Args[0], os.Args[1:])
 	if errC != nil {
 		panic(errC)
 	}

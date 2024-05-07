@@ -37,5 +37,5 @@ func (env *Env) Shorten(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusCreated, `http://localhost:8080/%s`, key)
+	c.String(http.StatusCreated, `%s/%s`, env.Config.BaseURL(), key)
 }

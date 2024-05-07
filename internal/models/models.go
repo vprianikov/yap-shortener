@@ -6,8 +6,8 @@ type (
 	ShortKey    string
 
 	Config interface {
-		Host() string
-		Port() string
+		ServerAddress() string
+		BaseURL() string
 	}
 
 	Storage interface {

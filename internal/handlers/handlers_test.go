@@ -46,7 +46,7 @@ func TestSuite(t *testing.T) {
 }
 
 func (s *Suite) SetupSuite() {
-	co, errC := config.New()
+	co, errC := config.New(`progName`, []string{})
 	st, errS := storage.New()
 
 	s.Require().NoError(errC, `failed to initialize the configuration`)

@@ -18,7 +18,7 @@ func New(env *handlers.Env) (*http.Server, error) {
 	router.GET(`/:shortKey`, env.Expand)
 
 	return &http.Server{
-		Addr:              `0.0.0.0:` + env.Config.Port(),
+		Addr:              env.Config.ServerAddress(),
 		Handler:           router,
 		ReadHeaderTimeout: 1 * time.Second,
 	}, nil
