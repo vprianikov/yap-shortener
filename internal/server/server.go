@@ -10,6 +10,7 @@ import (
 func New(env *handlers.Env) (*http.Server, error) {
 	mux := http.NewServeMux()
 	mux.HandleFunc(`/{shortKey}`, env.Expand)
+	mux.HandleFunc(`/`, env.Shorten)
 
 	return &http.Server{
 		Addr:              `0.0.0.0:` + env.Config.Port(),
