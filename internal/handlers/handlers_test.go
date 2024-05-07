@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/vprianikov/yap-shortener/internal/config"
@@ -17,16 +18,12 @@ type (
 	Suite struct {
 		suite.Suite
 		env handlers.Env
-	}
-
-	Path struct {
-		Name  string
-		Value string
+		r   *gin.Engine
 	}
 
 	Send struct {
 		Method  string
-		Path    []Path
+		Path    string
 		Headers http.Header
 		Body    []byte
 	}
@@ -59,12 +56,13 @@ func (s *Suite) SetupSuite() {
 		Config:  co,
 		Storage: st,
 	}
-}
 
-func setPath(r *http.Request, p []Path) {
-	for _, p := range p {
-		r.SetPathValue(p.Name, p.Value)
-	}
+	r := gin.New()
+	r.HandleMethodNotAllowed = true
+
+	r.POST(`/`, s.env.Shorten)
+	r.GET(`/:shortKey`, s.env.Expand)
+	s.r = r
 }
 
 func setHeaders(r *http.Request, h http.Header) {
@@ -83,15 +81,14 @@ func checkHeaders(s *Suite, r *http.Response, hs http.Header) {
 	}
 }
 
-func Run(s *Suite, handler func(http.ResponseWriter, *http.Request), tests []Test) {
+func Run(s *Suite, tests []Test) {
 	for _, test := range tests {
 		s.Run(test.Name, func() {
-			request := httptest.NewRequest(test.Send.Method, `/`, bytes.NewReader(test.Send.Body))
-			setPath(request, test.Send.Path)
+			request := httptest.NewRequest(test.Send.Method, test.Send.Path, bytes.NewReader(test.Send.Body))
 			setHeaders(request, test.Send.Headers)
 			recorder := httptest.NewRecorder()
 
-			handler(recorder, request)
+			s.r.ServeHTTP(recorder, request)
 
 			result := recorder.Result()
 			err := result.Body.Close()

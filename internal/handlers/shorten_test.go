@@ -8,6 +8,7 @@ func (s *Suite) TestShorten() {
 			Name: `positive test`,
 			Send: Send{
 				Method: http.MethodPost,
+				Path:   `/`,
 				Headers: map[string][]string{
 					`Content-Type`: {
 						`text/plain; charset=utf-8`,
@@ -28,6 +29,7 @@ func (s *Suite) TestShorten() {
 			Name: `not allowed`,
 			Send: Send{
 				Method: http.MethodGet,
+				Path:   `/`,
 			},
 			Want: Want{
 				Code: http.StatusMethodNotAllowed,
@@ -37,6 +39,7 @@ func (s *Suite) TestShorten() {
 			Name: `unsupported media type`,
 			Send: Send{
 				Method: http.MethodPost,
+				Path:   `/`,
 				Headers: map[string][]string{
 					`Content-Type`: {
 						`application/json`,
@@ -51,6 +54,7 @@ func (s *Suite) TestShorten() {
 			Name: `bad url`,
 			Send: Send{
 				Method: http.MethodPost,
+				Path:   `/`,
 				Headers: map[string][]string{
 					`Content-Type`: {
 						`text/plain; charset=utf-8`,
@@ -64,5 +68,5 @@ func (s *Suite) TestShorten() {
 		},
 	}
 
-	Run(s, s.env.Shorten, tests)
+	Run(s, tests)
 }

@@ -13,12 +13,7 @@ func (s *Suite) TestExpand() {
 			Name: `positive test`,
 			Send: Send{
 				Method: http.MethodGet,
-				Path: []Path{
-					{
-						Name:  `shortKey`,
-						Value: string(key),
-					},
-				},
+				Path:   `/` + string(key),
 			},
 			Want: Want{
 				Code: http.StatusTemporaryRedirect,
@@ -33,12 +28,7 @@ func (s *Suite) TestExpand() {
 			Name: `not found`,
 			Send: Send{
 				Method: http.MethodGet,
-				Path: []Path{
-					{
-						Name:  `key`,
-						Value: `gQXr0VLO`,
-					},
-				},
+				Path:   `/gQXr0VLO`,
 			},
 			Want: Want{
 				Code: http.StatusNotFound,
@@ -48,12 +38,7 @@ func (s *Suite) TestExpand() {
 			Name: `incorrect key format`,
 			Send: Send{
 				Method: http.MethodGet,
-				Path: []Path{
-					{
-						Name:  `key`,
-						Value: `gQXr0VL!`,
-					},
-				},
+				Path:   `/gQXr0VL!`,
 			},
 			Want: Want{
 				Code: http.StatusNotFound,
@@ -63,6 +48,7 @@ func (s *Suite) TestExpand() {
 			Name: `not allowed`,
 			Send: Send{
 				Method: http.MethodPost,
+				Path:   `/gQXr0VLO`,
 			},
 			Want: Want{
 				Code: http.StatusMethodNotAllowed,
@@ -70,5 +56,5 @@ func (s *Suite) TestExpand() {
 		},
 	}
 
-	Run(s, s.env.Expand, tests)
+	Run(s, tests)
 }

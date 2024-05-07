@@ -3,20 +3,16 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/vprianikov/yap-shortener/internal/models"
 )
 
-func (env *Env) Expand(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	u, err := env.Storage.Get(models.ShortKey(r.PathValue(`shortKey`)))
+func (env *Env) Expand(c *gin.Context) {
+	u, err := env.Storage.Get(models.ShortKey(c.Param(`shortKey`)))
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
-
-	http.Redirect(w, r, string(u), http.StatusTemporaryRedirect)
+	c.Redirect(http.StatusTemporaryRedirect, string(u))
 }

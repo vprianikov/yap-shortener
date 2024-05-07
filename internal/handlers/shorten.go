@@ -1,54 +1,41 @@
 package handlers
 
 import (
-	"errors"
-	"io"
 	"net/http"
 	"net/url"
+
+	"github.com/gin-gonic/gin"
 
 	"github.com/vprianikov/yap-shortener/internal/models"
 )
 
-func readRequest(r *http.Request) (string, error) {
-	if r.Header.Get(`Content-Type`) != `text/plain` && r.Header.Get(`Content-Type`) != `text/plain; charset=utf-8` {
-		return ``, errors.New(`unsupported media type`)
+func (env *Env) Shorten(c *gin.Context) {
+	if ct := c.ContentType(); ct != `text/plain` && ct != `text/plain; charset=utf-8` {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
 	}
 
-	body, errR := io.ReadAll(r.Body)
-	if errR != nil {
-		return ``, errR
+	data, err := c.GetRawData()
+	if err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
 	}
 
-	u, errP := url.ParseRequestURI(string(body))
+	u, errP := url.ParseRequestURI(string(data))
 	if errP != nil {
-		return ``, errP
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
 	}
 	if u.Scheme == `` || u.Host == `` {
-		return ``, errors.New(`scheme and host must be defined`)
-	}
-
-	return string(body), nil
-}
-
-func (env *Env) Shorten(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
-	u, errR := readRequest(r)
-	if errR != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	key, errS := env.Storage.Set(models.ExternalURL(u))
+	key, errS := env.Storage.Set(models.ExternalURL(data))
 	if errS != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set(`Content-Type`, `text/plain; charset=utf-8`)
-	w.WriteHeader(http.StatusCreated)
-	_, _ = w.Write([]byte(`http://` + env.Config.Host() + `:` + env.Config.Port() + `/` + string(key)))
+	c.String(http.StatusCreated, `http://localhost:8080/%s`, key)
 }
