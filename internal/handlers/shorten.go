@@ -33,6 +33,7 @@ func (env *Env) Shorten(c *gin.Context) {
 
 	key, errS := env.Storage.Set(models.ExternalURL(data))
 	if errS != nil {
+		// TODO(SSH): Internal Server Error надо логировать
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}

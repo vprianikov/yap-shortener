@@ -11,17 +11,20 @@ import (
 )
 
 type storage struct {
+	// TODO(SSH): не надо встраивать мьютексы
+	// Не надо использовать RWMutex, используй Mutex
 	sync.RWMutex
 	store map[models.ShortKey]models.ExternalURL
 }
 
 func New() (models.Storage, error) {
-	var m models.Storage = &storage{
+	m := &storage{
 		store: make(map[models.ShortKey]models.ExternalURL),
 	}
 	return m, nil
 }
 
+// TODO(SSH): лучше изменить сигнатуру и сразу принимать на вход и короткую и длинную ссылки
 func (s *storage) Set(url models.ExternalURL) (models.ShortKey, error) {
 	key, err := getRandomKey()
 	if err != nil {
@@ -43,7 +46,8 @@ func (s *storage) Set(url models.ExternalURL) (models.ShortKey, error) {
 
 func (s *storage) Get(key models.ShortKey) (models.ExternalURL, error) {
 	if !checkKey(key) {
-		return ``, errors.New(`key has an invalid format`)
+		// TODO(SSH): ошибка формируется так: fmt.Errorf("key %s has an invalid format", key)
+		return ``, errors.New("key has an invalid format")
 	}
 
 	s.RLock()
@@ -56,7 +60,9 @@ func (s *storage) Get(key models.ShortKey) (models.ExternalURL, error) {
 	return url, nil
 }
 
+// TODO(SSH): я бы не стал это делать
 func checkKey(key models.ShortKey) bool {
+	// TODO(SSH): скомпилируй регэксп заранее
 	r, e := regexp.MatchString(`\A[A-Za-z0-9]{8}\z`, string(key))
 	if e == nil && r {
 		return true
@@ -68,6 +74,7 @@ func getRandomKey() (models.ShortKey, error) {
 	const letters = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`
 	const length = 8
 
+	// TODO(SSH): используй слайс байтов
 	s := ``
 
 	for range length {

@@ -10,8 +10,10 @@ import (
 )
 
 func main() {
+	// TODO(SSH): errC -> err
 	c, errC := config.New(os.Args[0], os.Args[1:])
 	if errC != nil {
+		// TODO(SSH): https://app.pachca.com/chats/9180496?message=234290731
 		panic(errC)
 	}
 

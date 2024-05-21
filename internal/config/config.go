@@ -22,6 +22,7 @@ func New(progName string, args []string) (models.Config, error) {
 		return nil, err
 	}
 
+	// TODO(SSH): exists -> ok
 	if sa, exists := os.LookupEnv(`SERVER_ADDRESS`); exists {
 		c.serverAddress = sa
 	}
@@ -33,6 +34,7 @@ func New(progName string, args []string) (models.Config, error) {
 	return m, nil
 }
 
+// TODO(SSH): в Go не используются getter/setter (optional)
 func (c *config) ServerAddress() string {
 	return c.serverAddress
 }

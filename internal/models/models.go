@@ -5,6 +5,7 @@ type (
 	InternalURL string
 	ShortKey    string
 
+	// TODO(SSH): интерфейсы определяются там, где они используются
 	Config interface {
 		ServerAddress() string
 		BaseURL() string
