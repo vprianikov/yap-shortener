@@ -1,0 +1,70 @@
+openapi: 3.0.3
+info:
+  title: 'YAP-Shortener'
+  version: 0.1.0
+servers:
+  - url: 'http://{host}:{port}'
+    variables:
+      host:
+        enum:
+          - 'localhost'
+        default: 'localhost'
+      port:
+        enum:
+          - '8080'
+        default: '8080'
+paths:
+  '/':
+    post:
+      summary: 'Create short link'
+      requestBody:
+        content:
+          'text/plain':
+            schema:
+              $ref: '#/components/schemas/ExternalURL'
+        required: true
+      responses:
+        201:
+          description: 'Created'
+          content:
+            'text/plain':
+              schema:
+                $ref: '#/components/schemas/InternalURL'
+        400:
+          description: 'Bad Request'
+  '/{short-key}':
+    get:
+      summary: 'Get URL'
+      responses:
+        307:
+          description: 'Temporary Redirect'
+          headers:
+            'Location':
+              description: 'The URL to redirect a page to'
+              required: true
+              schema:
+                $ref: '#/components/schemas/ExternalURL'
+        404:
+          description: 'Not Found'
+        400:
+          description: 'Bad Request'
+    parameters:
+      - name: 'short-key'
+        in: 'path'
+        required: true
+        schema:
+          $ref: '#/components/schemas/ShortKey'
+components:
+  schemas:
+    'ExternalURL':
+      title: 'External URL'
+      example: 'https://practicum.yandex.ru/'
+      type: string
+    'InternalURL':
+      title: 'Internal URL'
+      example: 'http://localhost:8080/EwHXdJfB'
+      type: string
+    'ShortKey':
+      title: 'Short Key'
+      example: 'EwHXdJfB'
+      type: string
